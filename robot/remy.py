@@ -10,7 +10,7 @@ right_servo_default_angle = 0 # TODO: test this angle later
 def convert_angle_to_servo_value(angle): 
     return (angle - 90) / 90
 
-# define some functions here, about remy's actions 
+# define some functions here, about remy's actions related to servo motors 
 
 def chopping(): 
     # TODO: figure out a way to add in an interrupt so that it can go onto the next action
@@ -23,3 +23,18 @@ def chopping():
         right_servo.value = convert_angle_to_servo_value(0)
         time.sleep(0.2)
         curr_time = time.time()
+
+def stirring(): 
+    curr_time = time.time() 
+    end_time = curr_time + 5 
+    while curr_time < end_time: 
+        left_servo.value = convert_angle_to_servo_value(60) # TODO: figure out the value that it should move to here
+        time.sleep(0.2)
+        left_servo.value = convert_angle_to_servo_value(0)
+        time.sleep(0.2)
+        curr_time = time.time()
+
+import subprocess
+def play_audio(path): 
+    subprocess.run(["mpg321", path])
+
