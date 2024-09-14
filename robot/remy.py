@@ -1,8 +1,10 @@
 from gpiozero import Servo
+from gpiozero.pins.pigpio import PiGPIOFactory
 import time 
 
-left_servo = Servo(17)
-right_servo = Servo(27) # we can change the pin numbers later 
+factory = PiGPIOFactory()
+right_servo = Servo(17, pin_factory=factory) # we can change the pin numbers later
+left_servo = Servo(27, pin_factory=factory)
 
 left_servo_default_angle = 0
 right_servo_default_angle = 0 # TODO: test this angle later 
@@ -24,17 +26,13 @@ def chopping():
         time.sleep(0.2)
         curr_time = time.time()
 
-def stirring(): 
-    curr_time = time.time() 
-    end_time = curr_time + 5 
-    while curr_time < end_time: 
-        left_servo.value = convert_angle_to_servo_value(60) # TODO: figure out the value that it should move to here
+def stirring():
+    curr_time = time.time()
+    end_time = curr_time + 5
+    while curr_time < end_time:
+        left_servo.value = convert_angle_to_servo_value(120) # TODO: figure out the value that it should move to here
         time.sleep(0.2)
         left_servo.value = convert_angle_to_servo_value(0)
         time.sleep(0.2)
         curr_time = time.time()
-
-import subprocess
-def play_audio(path): 
-    subprocess.run(["mpg321", path])
 
