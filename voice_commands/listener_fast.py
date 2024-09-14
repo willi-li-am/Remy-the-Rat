@@ -18,6 +18,8 @@ client = OpenAI(api_key=api_key)
 audio_queue = queue.Queue()
 
 def transcribe_audio():
+    is_recording = False
+    voice_input = ""
     while True:
         audio_data = audio_queue.get()
         if audio_data is None:
@@ -36,13 +38,27 @@ def transcribe_audio():
                 )
             
             text = response.text.lower()
-            print("You said:", text)
+
+            # some function to bring is_recording to false
+
+            if voice_input and not is_recording:
+                """
+                Workflow:
+                adds voice input to a queue or something
+                event handler will handle the input
+                """
+                pass
 
             # Check for the target phrase
             if "what's up" in text:
                 print("=======================")
                 print("WHAT'S UP WAKE UP WORD!")
                 print("=======================")
+                is_recording = True
+                voice_input = text
+
+            if is_recording:
+                voice_input += text
 
             # Remove the temporary file
             os.remove("temp_audio.wav")
