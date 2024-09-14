@@ -14,25 +14,28 @@ def convert_angle_to_servo_value(angle):
 
 # define some functions here, about remy's actions related to servo motors 
 
-def chopping(): 
-    # TODO: figure out a way to add in an interrupt so that it can go onto the next action
-    # for now I hard code the time it is moving 
+def chopping(time_needed): 
     curr_time = time.time() 
-    end_time = curr_time + 5 
+    end_time = curr_time + time_needed 
     while curr_time < end_time: 
-        right_servo.value = convert_angle_to_servo_value(60) # TODO: figure out the value that it should move to here
+        right_servo.value = convert_angle_to_servo_value(180) # TODO: figure out the value that it should move to here
         time.sleep(0.2)
         right_servo.value = convert_angle_to_servo_value(0)
         time.sleep(0.2)
         curr_time = time.time()
+    right_servo.value = None
+    left_servo.value = None
 
-def stirring():
-    curr_time = time.time()
-    end_time = curr_time + 5
-    while curr_time < end_time:
-        left_servo.value = convert_angle_to_servo_value(120) # TODO: figure out the value that it should move to here
-        time.sleep(0.2)
+def fast_chopping(time_needed): 
+    curr_time = time.time() 
+    end_time = curr_time + time_needed 
+    while curr_time < end_time: 
+        right_servo.value = convert_angle_to_servo_value(180) # TODO: figure out the value that it should move to here
         left_servo.value = convert_angle_to_servo_value(0)
         time.sleep(0.2)
+        right_servo.value = convert_angle_to_servo_value(0)
+        left_servo.value = convert_angle_to_servo_value(180)
+        time.sleep(0.2)
         curr_time = time.time()
-
+    right_servo.value = None
+    left_servo.value = None
