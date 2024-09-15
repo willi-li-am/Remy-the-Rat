@@ -3,12 +3,13 @@
 from flask import Flask, request
 from robot import remy
 from pydub import AudioSegment
+from pathlib import Path
 
 app = Flask(__name__) 
 
 @app.route('/move_remy', methods=['GET'])
 def move_remy(): 
-    audio_path = request.args.get('audio_path')
+    audio_path = Path(__file__) / "audio" / "generated_files" / "speech2.mp3"
     audio = AudioSegment.from_file(audio_path)
     audio_length = len(audio) / 1000.0
     remy.fast_chopping(audio_length)
