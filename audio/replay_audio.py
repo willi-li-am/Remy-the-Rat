@@ -2,6 +2,7 @@ import pygame
 import time
 import threading
 import queue
+import os
 
 class AudioPlayer:
     def __init__(self):
@@ -18,7 +19,9 @@ class AudioPlayer:
         while self.is_running:
             try:
                 # Block until there is an audio file to play
-                audio_path = self.playback_queue.get(timeout=0.1)  # Wait for audio to be queued
+                audio = self.playback_queue.get(timeout=0.1)  # Wait for audio to be queued
+                audio_path = audio['audio']
+                should_delete = audio['should_delete']
                 pygame.mixer.music.load(audio_path)
                 print('audio loaded')
                 pygame.mixer.music.play()
@@ -27,14 +30,39 @@ class AudioPlayer:
                 # Wait until the music finishes playing before proceeding
                 while pygame.mixer.music.get_busy():
                     time.sleep(0.2)
+                
+                if should_delete:
+                    self.delete_file(audio_path)
     
             except queue.Empty:
                 continue  # If no audio is in the queue, keep waiting
+
+    def delete_file(self, file_path):
+        """
+        Deletes the file at the specified file path if it exists.
+
+        Parameters:
+        file_path (str): The path to the file to be deleted.
+
+        Returns:
+        str: A message indicating whether the file was deleted or if it didn't exist.
+        """
+        try:
+            if os.path.exists(file_path):
+                os.remove(file_path)
+                return f"File '{file_path}' has been deleted."
+            else:
+                return f"File '{file_path}' does not exist."
+        except Exception as e:
+            return f"An error occurred while deleting the file: {str(e)}"
 
     def stop(self):
         self.is_running = False
         self.playback_thread.join()  # Ensure thread finishes
 
-    def play(self, audio_path):
+    def play(self, audio_path, should_delete = False):
         """Add audio to the queue to be played."""
-        self.playback_queue.put(audio_path)
+        self.playback_queue.put({
+            "audio": audio_path,
+            "should_delete": should_delete
+        })
