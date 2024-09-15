@@ -7,6 +7,7 @@ import speech_recognition as sr
 from dotenv import load_dotenv
 import threading
 import queue
+from audio import AudioPlayer
 
 def takePhoto(): pass
 def askChatGPT(context, command, photo): pass
@@ -21,7 +22,10 @@ class Remy():
         self.audio_queue = queue.Queue()
         self.stop_event = threading.Event()
         self.question_event = threading.Event()
+        self.audio_player = AudioPlayer()
         self.handler_thread = None
+        self.listener_thread = None
+        self.transcribe_thread = None
         # Load environment variables from .env file
         load_dotenv()
 
@@ -30,6 +34,7 @@ class Remy():
 
         # Initialize OpenAI client
         self.client = OpenAI(api_key=self.api_key)
+        self.start()
 
     def respondToCommand(self, response: str) -> None:
         """
@@ -113,11 +118,11 @@ class Remy():
                 if (self.question_event.is_set()):
                     self.question_event.clear()
                     self.command_queue.put(text)
-                    
+
                 # Check for the target phrase
                 if "what's up" in text:
                     self.question_event.set()
-                    # play DA DING
+                    self.audio_player.play("./chime.mp3")
 
                 # Remove the temporary file
                 os.remove("temp_audio.wav")
@@ -127,25 +132,27 @@ class Remy():
 
     
     def start(self):
-        try:
-            self.handler_thread = threading.Thread(target=self.command_handler)
-            self.listener_thread = threading.Thread(target=self.listen_audio)
-            self.transcribe_thread = threading.Thread(target=self.transcribe_audio)
-            self.handler_thread.start()
-            self.listener_thread.start()
-            self.transcribe_thread.start()
-        except KeyboardInterrupt:
-            print("Stopping...")
-            self.command_queue.put(None) 
-            self.audio_queue.put(None)
-            self.listener_thread.join()
-            self.transcribe_thread.join()
-            self.handler_thread.join()
-            return  
+        self.handler_thread = threading.Thread(target=self.command_handler)
+        self.listener_thread = threading.Thread(target=self.listen_audio)
+        self.transcribe_thread = threading.Thread(target=self.transcribe_audio)
+        self.handler_thread.start()
+        self.listener_thread.start()
+        self.transcribe_thread.start()
+
+    def stop(self):
+        print("Stopping...")
+        self.command_queue.put(None) 
+        self.audio_queue.put(None)
+        self.listener_thread.join()
+        self.transcribe_thread.join()
+        self.handler_thread.join()
 
     def add(self, command):
         self.command_queue.put(command)
 
 if __name__ == '__main__':
-    remy = Remy()
-    remy.start()
+    remy = None
+    try:
+        remy = Remy()
+    except KeyboardInterrupt:
+        remy.stop()
