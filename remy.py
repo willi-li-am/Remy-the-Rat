@@ -1,6 +1,5 @@
 import queue
 import threading
-import time
 import os
 from openai import OpenAI
 import speech_recognition as sr
@@ -9,7 +8,7 @@ import threading
 import queue
 from audio import AudioPlayer
 from datetime import datetime
-from pathlib import Path
+from robot import move_robot
 
 def takePhoto(): pass
 def askChatGPT(context, command, photo): pass
@@ -42,13 +41,13 @@ class Remy():
         """
         We want this to play response audio, move remy arms
         """
+        time = None
         print("response:", response)
-        time = getTimeToRespond(response)
         audio_path = self.text_to_audio(response)
-        print(audio_path)
         if audio_path:
-            self.audio_player.play("./" + audio_path, should_delete=True)
-        moveRemy(time)
+            time = self.audio_player.get_audio_length(audio_path)
+            self.audio_player.play(audio_path, should_delete=True)
+            move_robot(time)
         
     def sendCommand(self, command: str) -> None:
         """

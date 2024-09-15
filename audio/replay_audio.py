@@ -3,6 +3,7 @@ import time
 import threading
 import queue
 import os
+from mutagen.mp3 import MP3
 
 class AudioPlayer:
     def __init__(self):
@@ -11,6 +12,11 @@ class AudioPlayer:
         self.playback_thread = threading.Thread(target=self._playback_worker, daemon=True)
         self.playback_thread.start()
         self.is_playing = True
+
+    def get_audio_length(self, audio_path):
+        audio = MP3(audio_path)
+        duration_in_seconds = audio.info.length
+        return duration_in_seconds
 
     def _playback_worker(self):
         """Worker thread that continuously checks for audio to play."""
