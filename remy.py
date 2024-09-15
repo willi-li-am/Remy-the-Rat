@@ -7,6 +7,7 @@ from dotenv import load_dotenv
 import threading
 import queue
 from audio import AudioPlayer
+from video import VideoPlayer
 from datetime import datetime
 from robot import move_robot
 
@@ -24,6 +25,7 @@ class Remy():
         self.stop_event = threading.Event()
         self.question_event = threading.Event()
         self.audio_player = AudioPlayer()
+        self.video_player = VideoPlayer()
         self.handler_thread = None
         self.listener_thread = None
         self.transcribe_thread = None
