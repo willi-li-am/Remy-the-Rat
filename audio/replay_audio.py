@@ -2,6 +2,7 @@ import pygame
 import time
 import threading
 import queue
+import os
 
 class AudioPlayer:
     def __init__(self):
@@ -31,11 +32,29 @@ class AudioPlayer:
                     time.sleep(0.2)
                 
                 if should_delete:
-                    #TODO add delete function here
-                    pass
+                    self.delete_file(audio_path)
     
             except queue.Empty:
                 continue  # If no audio is in the queue, keep waiting
+
+    def delete_file(self, file_path):
+        """
+        Deletes the file at the specified file path if it exists.
+
+        Parameters:
+        file_path (str): The path to the file to be deleted.
+
+        Returns:
+        str: A message indicating whether the file was deleted or if it didn't exist.
+        """
+        try:
+            if os.path.exists(file_path):
+                os.remove(file_path)
+                return f"File '{file_path}' has been deleted."
+            else:
+                return f"File '{file_path}' does not exist."
+        except Exception as e:
+            return f"An error occurred while deleting the file: {str(e)}"
 
     def stop(self):
         self.is_running = False
