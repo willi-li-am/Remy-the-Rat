@@ -33,7 +33,7 @@ function App() {
   return (
     <div className="app-wrapper">
       <div className="sign-container">
-        <img src={ratatouilleSign} alt="Ratatouille Sign" className="ratatouille-sign" />
+        <img src={"data:image/jpg;base64," + ratatouilleSign} alt="Ratatouille Sign" className="ratatouille-sign" />
       </div>
       <div className="container">
         {data.map((item, index) => (
