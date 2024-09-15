@@ -1,6 +1,5 @@
 from gpiozero import Servo
 from gpiozero.pins.pigpio import PiGPIOFactory
-from gpiozero.pins.pigpio import PiGPIOFactory
 import time 
 
 factory = PiGPIOFactory()
