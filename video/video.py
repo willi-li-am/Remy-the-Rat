@@ -41,11 +41,6 @@ class VideoPlayer:
             
             if key == ord('q'):
                 break
-            elif key == ord('c'):
-                print("CAPTURING")
-                self.capture_frame_as_base64(frame)
-                self.predict_frame(frame)
-               
 
         # Release the camera and close all OpenCV windows
         self.camera.release()
