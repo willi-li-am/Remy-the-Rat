@@ -1,0 +1,113 @@
+.sign-container {
+  width: 20%;
+  text-align: center;
+  margin-top: 0px;
+  margin-bottom: 40px;
+}
+
+.ratatouille-sign {
+  max-width: 100%;
+  height: auto;
+}
+
+.app-wrapper {
+  position: relative; /* Important to set the positioning for layering */
+  display: flex;
+  flex-direction: column; /* Ensure items are stacked vertically */
+  justify-content: flex-start;
+  align-items: center;
+  min-height: 100vh;
+  padding: 65px;
+  padding-top: 40px;
+  box-sizing: border-box;
+  /* background-color: #1e1a17; Fallback color if image fails to load */
+}
+
+
+.app-wrapper::before {
+  content: '';
+  position: fixed; /* Keep the image fixed in place */
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: url('./assets/rat_paris.jpg'); /* Your background image */
+  background-size: cover; /* Ensure the image covers the entire viewport while maintaining aspect ratio */
+  background-position: center; /* Center the image */
+  background-repeat: no-repeat;
+  background-attachment: fixed; /* Prevent the background from moving when scrolling */
+  z-index: -1; /* Puts the background behind the content */
+  opacity: 0.4; /* Adjust the opacity to dim the image */
+}
+
+
+
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.card {
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+  width: 100%;
+  margin-bottom: 32px;
+  border-radius: 12px;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  background-color: #ffffff; /* Card background color */
+}
+
+.card:nth-child(even) {
+  flex-direction: row-reverse;
+}
+
+.card img {
+  width: 60%;
+  height: 400px;
+  object-fit: cover;
+  margin: 0;
+}
+
+.card-content {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 32px;
+  width: 40%;
+  background-color: #f0f0f0; /* Set this to match your overall background color */
+  color: #333;
+}
+
+/* Apply Croissant One to h3 for subtitles */
+.card-content h3 {
+  font-family: "Lora", serif;
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 16px;
+}
+
+/* Apply Merriweather to p for body text */
+.card-content p {
+  font-family: 'Merriweather', serif;
+  font-size: 1.125rem;
+  line-height: 1.6;
+}
+
+@media (max-width: 768px) {
+  .card, .card:nth-child(even) {
+    flex-direction: column;
+  }
+
+  .card img, .card-content {
+    width: 100%;
+  }
+
+  .card img {
+    height: 300px;
+  }
+}
