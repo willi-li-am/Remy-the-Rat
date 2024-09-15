@@ -10,18 +10,14 @@ from datetime import datetime
 from audio import AudioPlayer
 from video import VideoPlayer
 from robot import move_robot
-
-def takePhoto(): pass
-def askChatGPT(context, command, photo): pass
-def replayAudio(audio_path): pass
-def getTimeToRespond(audio_path): pass
-def moveRemy(audio_length): pass
+from flask_cors import CORS
 
 class Remy():
     def __init__(self) -> None:
         # Flask and SocketIO initialization
         self.app = Flask(__name__)
-        self.socketio = SocketIO(self.app)
+        CORS(self.app, origins="*")  # Allow only this origin
+        self.socketio = SocketIO(self.app, cors_allowed_origins="*")
 
         # Register Socket.IO event handlers
         self.register_socketio_events()
@@ -63,16 +59,13 @@ class Remy():
         def handle_disconnect():
             print("Client disconnected")
 
-        # @self.socketio.on('moveremy')
-        # def handle_moveremy(data):
-        #     print(f"Received audio_length: {data['audio_length']}")
-        #     moveRemy(data['audio_length'])
-        #     # Respond back to the client
-        #     self.socketio.emit('moveremy_response', {'status': 'success', 'message': 'Audio processed'})
+        @self.socketio.on('receive')
+        def handle_receive(data):
+            self.socketio.emit('receive', self.conversation)
 
     def run_socketio_server(self):
         # Start the Flask-SocketIO server in a separate thread
-        server_thread = threading.Thread(target=self.socketio.run, args=(self.app,), kwargs={'host': '0.0.0.0', 'port': 5000})
+        server_thread = threading.Thread(target=self.socketio.run, args=(self.app,), kwargs={'host': '0.0.0.0', 'port': 5500})
         server_thread.start()
 
     def respondToCommand(self, response: str) -> None:
@@ -88,11 +81,13 @@ class Remy():
         print("command:", command)
         photo = self.video_player.capture_frame_as_base64()
         response = self._remy_gpt(" ".join(self.context), command)
-        self.conversation.append({
+        new_response = {
             "img": photo,
             "question": command,
             "answer": response
-        })
+        }
+        self.socketio.emit('receive', [new_response])
+        self.conversation.append(new_response)
         self.context.append("Client: " + command)
         self.context.append("Remy: " + response)
         self.respondToCommand(response)
@@ -199,7 +194,7 @@ class Remy():
         response = self.client.chat.completions.create(
             model="ft:gpt-3.5-turbo-1106:personal:remy:A7TF2xZK",
             messages=[
-                {"role": "system", "content": "You are Remy the rat from Ratatouille..."},
+                {"role": "system", "content": "You are Remy the rat from Ratatouille. Guide users through this recipe: Smash 1 cucumber and cut into bite-sized pieces. Mix 1 teaspoon salt, 2 teaspoons sugar, 1 teaspoon sesame oil, 2 teaspoons soy sauce, and 1 tablespoon rice vinegar to make dressing. Toss cucumber with dressing, 3 chopped garlic cloves, and 1 teaspoon chili oil. Garnish with 1 tsp sesame seeds and cilantro. with step by step with concise responses."},
                 {"role": "user", "content": "context: " + context + ". This is the new question I am asking: " + text}
             ],
             max_tokens=150

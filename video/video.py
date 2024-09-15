@@ -46,7 +46,7 @@ class VideoPlayer:
         self.camera.release()
         cv2.destroyAllWindows()
 
-    def capture_frame_as_base64(self, frame):
+    def capture_frame_as_base64(self):
         if self.is_running:
             ret, frame = self.camera.read()
             if not ret:
