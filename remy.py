@@ -8,6 +8,8 @@ from dotenv import load_dotenv
 import threading
 import queue
 from audio import AudioPlayer
+from datetime import datetime
+from pathlib import Path
 
 def takePhoto(): pass
 def askChatGPT(context, command, photo): pass
@@ -40,20 +42,23 @@ class Remy():
         """
         We want this to play response audio, move remy arms
         """
+        print("response:", response)
         time = getTimeToRespond(response)
-        replayAudio(response)
+        audio_path = self.text_to_audio(response)
+        print(audio_path)
+        if audio_path:
+            self.audio_player.play("./" + audio_path, should_delete=True)
         moveRemy(time)
         
-
     def sendCommand(self, command: str) -> None:
         """
         We want to send the voice command to chatgpt + video/photo for more context
         """
         print("command:", command)
-        self.context.append(command)
         photo = takePhoto()
-        response = askChatGPT(self.context, command, photo)
-        self.context.append(response)
+        response = self._remy_gpt(" ".join(self.context), command)
+        self.context.append("Client: " + command)
+        self.context.append("Remy: " + response)
         self.respondToCommand(response)
 
     def command_handler(self):
@@ -130,6 +135,30 @@ class Remy():
             except Exception as e:
                 print(f"An error occurred: {str(e)}")
 
+    def text_to_audio(self, text, subfolder="generated_audio"):
+        # Create the full path to the subfolder
+        subfolder_path = "./" + subfolder
+        
+        # Create the subfolder if it doesn't exist
+        if not os.path.exists(subfolder_path):
+            os.makedirs(subfolder_path)
+
+        # Define the file path for the audio output using a timestamp
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        speech_file_path = subfolder_path + "/" + f"remy_gpt_output_audio_{timestamp}.mp3"
+
+        # Generate speech using the Alloy voice with the GPT response
+        response = self.client.audio.speech.create(
+            model="tts-1",
+            voice="echo",
+            input=text
+        )
+
+        # Save the speech to the file
+        response.stream_to_file(speech_file_path)
+
+        # Return the path to the generated audio file as a string
+        return speech_file_path
     
     def start(self):
         self.handler_thread = threading.Thread(target=self.command_handler)
@@ -149,6 +178,17 @@ class Remy():
 
     def add(self, command):
         self.command_queue.put(command)
+
+    def _remy_gpt(self, context, text):
+        response = self.client.chat.completions.create(
+            model="ft:gpt-3.5-turbo-1106:personal:remy:A7TF2xZK",
+            messages=[
+                {"role": "system", "content": "You are Remy the rat from Ratatouille. Guide users through this recipe: Smash 1 cucumber and cut into bite-sized pieces. Mix 1 teaspoon salt, 2 teaspoons sugar, 1 teaspoon sesame oil, 2 teaspoons soy sauce, and 1 tablespoon rice vinegar to make dressing. Toss cucumber with dressing, 3 chopped garlic cloves, and 1 teaspoon chili oil. Garnish with 1 tsp sesame seeds and cilantro. with step by step with concise responses."},
+                {"role": "user", "content": "context: " + context + ". This is the new question I am asking: " + text}
+            ],
+            max_tokens=150
+        )
+        return response.choices[0].message.content.strip()
 
 if __name__ == '__main__':
     remy = None
