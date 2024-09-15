@@ -1,6 +1,6 @@
 #do some flask shit
 
-from flask import Flask, request
+from flask import Flask
 from robot import remy
 from pydub import AudioSegment
 from pathlib import Path
@@ -13,6 +13,7 @@ def move_remy():
     audio = AudioSegment.from_file(audio_path)
     audio_length = len(audio) / 1000.0
     remy.fast_chopping(audio_length)
+    return '', 204
 
 
 if __name__ == "__main__": 
