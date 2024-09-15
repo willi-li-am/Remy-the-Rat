@@ -12,3 +12,7 @@ def move_remy():
     audio = AudioSegment.from_file(audio_path)
     audio_length = len(audio) / 1000.0
     remy.fast_chopping(audio_length)
+
+
+if __name__ == "__main__": 
+    app.run("127.0.0.1", port=5000)
