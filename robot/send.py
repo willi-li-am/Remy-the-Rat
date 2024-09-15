@@ -2,7 +2,7 @@ import requests
 
 def move_robot(time):
     # The URL to which the POST request will be sent
-    url = 'http://127.0.0.1:5000/move_remy'
+    url = 'http://10.37.118.233:5000/move_remy?audio_length=' + str(time)
 
     # The data you want to send in the POST request (as a dictionary)
     data = {

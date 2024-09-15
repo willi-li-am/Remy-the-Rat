@@ -11,7 +11,7 @@ right_servo_default_angle = 0 # TODO: test this angle later
 def convert_angle_to_servo_value(angle): 
     return (angle - 90) / 90
 
-# define some functions here, about remy's actions 
+# define some functions here, about remy's actions related to servo motors 
 
 def fast_chopping(time_needed): 
     # TODO: figure out a way to add in an interrupt so that it can go onto the next action
