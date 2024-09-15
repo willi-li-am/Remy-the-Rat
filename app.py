@@ -9,7 +9,7 @@ app = Flask(__name__)
 
 @app.route('/move_remy', methods=['GET'])
 def move_remy(): 
-    audio_path = Path(__file__) / "audio" / "generated_files" / "speech2.mp3"
+    audio_path = Path(__file__).parent / "audio" / "generated_files" / "speech2.mp3"
     audio = AudioSegment.from_file(audio_path)
     audio_length = len(audio) / 1000.0
     remy.fast_chopping(audio_length)
